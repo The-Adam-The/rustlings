@@ -9,15 +9,15 @@
 use std::collections::HashMap;
 
 // A structure to store the goal details of a team.
-#[derive(Default)]
-struct TeamScores {
+#[derive(Default, Debug)]
+pub struct TeamScores {
     goals_scored: u8,
     goals_conceded: u8,
 }
 
 fn build_scores_table(results: &str) -> HashMap<&str, TeamScores> {
     // The name of the team is the key and its associated struct is the value.
-    let mut scores = HashMap::new();
+    let mut scores: HashMap<&str, TeamScores>= HashMap::new();
 
     for line in results.lines() {
         let mut split_iterator = line.split(',');
@@ -31,8 +31,32 @@ fn build_scores_table(results: &str) -> HashMap<&str, TeamScores> {
         // Keep in mind that goals scored by team 1 will be the number of goals
         // conceded by team 2. Similarly, goals scored by team 2 will be the
         // number of goals conceded by team 1.
-    }
+        
+        let mut team_1_scores = TeamScores { goals_scored: 0, goals_conceded: 0};
+        let mut team_2_scores = TeamScores { goals_scored: 0, goals_conceded: 0};
 
+        if !scores.contains_key(team_1_name) {
+            team_1_scores.goals_scored = team_1_score;
+            team_1_scores.goals_conceded = team_2_score;
+            
+        } else {
+                
+            team_1_scores.goals_scored = scores[team_1_name].goals_scored + team_1_score;
+            team_1_scores.goals_conceded = scores[team_1_name].goals_conceded + team_2_score
+        };
+        scores.insert(team_1_name, team_1_scores);
+        
+        if !scores.contains_key(team_2_name) {
+            team_2_scores.goals_scored = team_2_score;
+            team_2_scores.goals_conceded = team_1_score;
+
+        } else {
+            team_2_scores.goals_scored = scores[team_2_name].goals_scored + team_2_score;
+            team_2_scores.goals_conceded = scores[team_2_name].goals_conceded + team_1_score;
+        }
+        scores.insert(team_2_name, team_2_scores);
+
+    }
     scores
 }
 
